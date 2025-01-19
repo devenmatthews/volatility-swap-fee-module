@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
@@ -64,3 +65,7 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+=======
+# community-discount-swap-fee-module
+A Valantis Swap Fee Module for giving a fee discount to community members based on onchain criteria
+>>>>>>> d8802ec4f76468bd4736a3c9e785edce7b1fd6d3
