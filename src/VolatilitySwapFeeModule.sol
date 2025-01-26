@@ -8,12 +8,12 @@ import {ISovereignOracle} from "@valantis-core/src/oracles/interfaces/ISovereign
  * @title Volatility Swap Fee Module.
  * @dev Volatility Swap Fee Module for Valantis Sovereign Pool.
  */
-contract VolatilitySwapFeeModule {
+contract VolatilitySwapFeeModule is ISwapFeeModule, ISovereignOracle {
 
-    struct SwapFeeModuleData {
-    uint256 feeInBips;
-    bytes internalContext;
-}
+//     struct SwapFeeModuleData {
+//     uint256 feeInBips;
+//     bytes internalContext;
+// }
 
 // Fee tiers
 uint256 public immutable FEE_MIN;
@@ -49,4 +49,18 @@ function getSwapFeeInBips(
         swapFeeModuleData.internalContext = abi.encode(0);
         return swapFeeModuleData;
     }
+
+function callbackOnSwapEnd(
+        uint256 _effectiveFee,
+        int24 _spotPriceTick,
+        uint256 _amountInUsed,
+        uint256 _amountOut,
+        SwapFeeModuleData memory _swapFeeModuleData
+    ) external {
+        volatilityAccumulator += amountInMinusFee * fee;
+        volatilityAccumulator = Math.min(volatilityAccumulator, FEE_MAX);
+        volatilityAccumulator = Math.max(volatilityAccumulator, FEE_MIN);
+    }
+
+
 }
