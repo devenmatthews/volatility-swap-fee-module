@@ -9,7 +9,7 @@ import {ISovereignPool} from "@valantis-core/pools/interfaces/ISovereignPool.sol
 contract ValidlyVolatileFactory is ValidlyFactory {
     constructor(
         address _protocolFactory
-    ) ValidlyFactory(_protocolFactory, 0) {} // Pass 0 for feeBips since we're using dynamic fees
+    ) ValidlyFactory(_protocolFactory, 1) {} // Pass 1 (0.01%) instead of 0
 
     function createPairWithVolatilityFee(
         address _token0, 
@@ -33,13 +33,27 @@ contract ValidlyVolatileFactory is ValidlyFactory {
             _volatilityMultiplier // volatilityMultiplier
         );
 
+//         struct SovereignPoolConstructorArgs {
+//     address token0;
+//     address token1;
+//     address protocolFactory;
+//     address poolManager;
+//     address sovereignVault;
+//     address verifierModule;
+//     bool isToken0Rebase;
+//     bool isToken1Rebase;
+//     uint256 token0AbsErrorTolerance;
+//     uint256 token1AbsErrorTolerance;
+//     uint256 defaultSwapFeeBips;
+// }
+
         SovereignPoolConstructorArgs memory args = SovereignPoolConstructorArgs(
             _token0,
             _token1,
             address(protocolFactory),
-            address(this),
-            address(volatilityFeeModule), // Use volatility fee module
-            address(0),
+            address(this), // poolManager
+            address(0), // sovereignVault
+            address(0), // verifierModule
             false,
             false,
             0,
@@ -52,6 +66,7 @@ contract ValidlyVolatileFactory is ValidlyFactory {
         Validly validly = new Validly{salt: poolKey}(pool, false);
 
         ISovereignPool(pool).setALM(address(validly));
+        ISovereignPool(pool).setSwapFeeModule(address(volatilityFeeModule));
 
         pools[poolKey] = pool;
 

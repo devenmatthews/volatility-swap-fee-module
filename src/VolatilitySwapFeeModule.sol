@@ -30,15 +30,29 @@ constructor(
     FEE_MAX = _feeMax;
     ALPHA = _alpha;
     VOLATILITY_MULTIPLIER = _volatilityMultiplier;
-    }
+    
+    // Initialize state variables
+    volatilityAccumulator = 0;
+    lastPrice = 1e18;  // Initialize with 1.0
+}
+
+function getVolatilityOracle() external view returns (uint256) {
+    return volatilityAccumulator;
+}
+
+function getCurrentFee() external view returns (uint256) {
+    uint256 feeInBips = FEE_MIN + volatilityAccumulator * VOLATILITY_MULTIPLIER;
+    feeInBips = Math.min(feeInBips, FEE_MAX);
+    return Math.max(feeInBips, FEE_MIN);
+}
 
 function getSwapFeeInBips(
-        address _tokenIn,
-        address _tokenOut,
-        uint256 _amountIn,
-        address _user,
-        bytes memory _swapFeeModuleContext
-    ) external returns (SwapFeeModuleData memory swapFeeModuleData) {
+        address,
+        address,
+        uint256,
+        address,
+        bytes memory
+    ) external view returns (SwapFeeModuleData memory swapFeeModuleData) {
         // Calculate the fee in bips based on the volatility accumulator prior to the swap.
         uint256 feeInBips = FEE_MIN + volatilityAccumulator * VOLATILITY_MULTIPLIER;
         feeInBips = Math.min(feeInBips, FEE_MAX);
@@ -57,7 +71,7 @@ function getSwapFeeInBips(
         uint256 _effectiveFee,
         uint256 _amountInUsed,
         uint256 _amountOut,
-        SwapFeeModuleData memory _swapFeeModuleData
+        SwapFeeModuleData memory
     ) external {
         // Update volatility accumulator using the final price, discluding the fee.
         uint256 priceWithoutFee = _amountOut * 1e18 / (_amountInUsed * (1e18 - _effectiveFee));
@@ -78,12 +92,12 @@ function getSwapFeeInBips(
     // IGNORE THIS FUNCTION
     // For compatibility with the Universal Pool Type (not implemented)
     function callbackOnSwapEnd(
-        uint256 _effectiveFee,
-        int24 _spotPriceTick,
-        uint256 _amountInUsed,
-        uint256 _amountOut,
-        SwapFeeModuleData memory _swapFeeModuleData
-    ) external {
+        uint256,
+        int24,
+        uint256,
+        uint256,
+        SwapFeeModuleData memory
+    ) external pure {
         // not implemented
         return;
     }
