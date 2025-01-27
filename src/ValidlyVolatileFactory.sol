@@ -27,25 +27,11 @@ contract ValidlyVolatileFactory is ValidlyFactory {
 
         // Deploy a new VolatilitySwapFeeModule for this specific pool
         VolatilitySwapFeeModule volatilityFeeModule = new VolatilitySwapFeeModule(
-            0, // feeMin    
+            100, // feeMin    
             1500, // feeMax
             _alpha, // alpha
             _volatilityMultiplier // volatilityMultiplier
         );
-
-//         struct SovereignPoolConstructorArgs {
-//     address token0;
-//     address token1;
-//     address protocolFactory;
-//     address poolManager;
-//     address sovereignVault;
-//     address verifierModule;
-//     bool isToken0Rebase;
-//     bool isToken1Rebase;
-//     uint256 token0AbsErrorTolerance;
-//     uint256 token1AbsErrorTolerance;
-//     uint256 defaultSwapFeeBips;
-// }
 
         SovereignPoolConstructorArgs memory args = SovereignPoolConstructorArgs(
             _token0,
@@ -67,6 +53,11 @@ contract ValidlyVolatileFactory is ValidlyFactory {
 
         ISovereignPool(pool).setALM(address(validly));
         ISovereignPool(pool).setSwapFeeModule(address(volatilityFeeModule));
+
+        // Add check to ensure setSwapFeeModule succeeded
+        if (ISovereignPool(pool).swapFeeModule() != address(volatilityFeeModule)) {
+            revert("Failed to set swap fee module");
+        }
 
         pools[poolKey] = pool;
 

@@ -57,7 +57,6 @@ function getSwapFeeInBips(
         uint256 feeInBips = FEE_MIN + volatilityAccumulator * VOLATILITY_MULTIPLIER;
         feeInBips = Math.min(feeInBips, FEE_MAX);
         feeInBips = Math.max(feeInBips, FEE_MIN);
-        swapFeeModuleData.feeInBips = feeInBips;
         swapFeeModuleData.internalContext = abi.encode(0);
         return swapFeeModuleData;
     }
