@@ -4,7 +4,10 @@ out = "out"
 libs = ["lib"]
 remappings = [
     "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
-    "@openzeppelin-contracts/=lib/openzeppelin-contracts/"
+    "@openzeppelin-contracts/=lib/openzeppelin-contracts/",
+    "@valantis-core/=lib/valantis-core/src/",
+    "@valantis/=lib/valantis-core/src/",
+    "@validly/=lib/validly/src/"
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
