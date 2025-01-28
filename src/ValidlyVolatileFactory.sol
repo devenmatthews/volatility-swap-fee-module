@@ -53,6 +53,7 @@ contract ValidlyVolatileFactory is ValidlyFactory {
 
         ISovereignPool(pool).setALM(address(validly));
         ISovereignPool(pool).setSwapFeeModule(address(volatilityFeeModule));
+        VolatilitySwapFeeModule(address(volatilityFeeModule)).setPool(pool);
 
         // Add check to ensure setSwapFeeModule succeeded
         if (ISovereignPool(pool).swapFeeModule() != address(volatilityFeeModule)) {
