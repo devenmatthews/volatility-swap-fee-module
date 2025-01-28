@@ -140,20 +140,29 @@ contract VolatilitySwapFeeModule is ISwapFeeModule {
     }
 
     // @dev Callback function called by the pool after the swap has finished. ( Sovereign Pools )
-    // @param _effectiveFee The effective fee charged for the swap.
     // @param _amountInUsed The amount of tokenIn used for the swap.
     // @param _amountOut The amount of the tokenOut transferred to the user.
     // @param _swapFeeModuleData The context data returned by getSwapFeeInBips. 
     function callbackOnSwapEnd(
-        uint256 _effectiveFee,
+        uint256 ,
         uint256 _amountInUsed,
         uint256 _amountOut,
         SwapFeeModuleData memory _swapFeeModuleData
     ) external onlyPool {
         // Update volatility accumulator using the final price, discluding the fee.
-        uint256 priceWithoutFee = _amountOut * 1e18 / (_amountInUsed * _swapFeeModuleData.feeInBips);
-        uint256 priceRatio = Math.log2(priceWithoutFee / lastPrice);
-        volatilityAccumulator = EMA(priceRatio, ALPHA, volatilityAccumulator);
+        uint256 priceWithoutFee = _amountOut * 1e18 / (_amountInUsed * (BIPS - _swapFeeModuleData.feeInBips) / BIPS);
+        
+        // Calculate absolute log return squared
+        uint256 logReturn;
+        if (priceWithoutFee >= lastPrice) {
+            logReturn = Math.log2(priceWithoutFee / lastPrice);
+        } else {
+            logReturn = Math.log2(lastPrice / priceWithoutFee);
+        }
+        uint256 squaredReturn = logReturn * logReturn / 1e18; // Scale down the square
+        
+        // Update EMA with squared return
+        volatilityAccumulator = EMA(squaredReturn, ALPHA, volatilityAccumulator);
         lastPrice = priceWithoutFee;
     }
 

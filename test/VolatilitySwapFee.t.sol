@@ -38,8 +38,8 @@ contract VolatilitySwapFeeTest is Test {
         volatilePair = Validly(factory.createPairWithVolatilityFee(
             address(token0),
             address(token1),
-            9, // alpha (99%)
-            100   // volatilityMultiplier
+            9e5, // alpha (99%)
+            10000   // volatilityMultiplier
         ));
 
         volatilePool = volatilePair.pool();
@@ -90,12 +90,12 @@ contract VolatilitySwapFeeTest is Test {
         uint256 initialFee = feeModule.getCurrentFee();
         assertEq(MIN_FEE, initialFee, "Initial fee should be minimum fee");
 
-        // Do multiple swaps back and forth to increase volatility
-        // for(uint i = 0; i < 5; i++) {
-        //     params.isZeroToOne = !params.isZeroToOne;
-        //     params.swapTokenOut = params.isZeroToOne ? address(token1) : address(token0);
-        //     volatilePool.swap(params);
-        // }
+        //Do multiple swaps back and forth to increase volatility
+        for(uint i = 0; i < 5; i++) {
+            params.isZeroToOne = !params.isZeroToOne;
+            params.swapTokenOut = params.isZeroToOne ? address(token0) : address(token1);
+            volatilePool.swap(params);
+        }
         volatilePool.swap(params);
 
         // // // Check if fee increased
